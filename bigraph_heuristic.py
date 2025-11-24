@@ -1,3 +1,5 @@
+"""使用启发式策略的双图攻击脚本，含中文注释。"""
+
 import argparse
 import time
 

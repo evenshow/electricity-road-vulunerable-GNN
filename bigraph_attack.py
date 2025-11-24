@@ -1,3 +1,5 @@
+"""执行双图攻击实验的脚本，添加中文注释方便理解参数含义。"""
+
 import argparse
 import time
 
@@ -10,6 +12,7 @@ from utils import (calculate_pairwise_connectivity, influenced_tl_by_elec,
 
 init()
 
+# ====== 参数解析区：控制训练、探索与特征来源 ======
 parser = argparse.ArgumentParser(description='elec attack')
 
 parser.add_argument('--epoch', type=int, default=1000, help='Times to train')
@@ -52,6 +55,7 @@ device = torch.device("cuda:1" if torch.cuda.is_available() else 'cpu')
 
 if __name__ == "__main__":
 
+    # 1. 构建电力子图，加载预训练或随机特征
     egraph = ElecGraph(file=EFILE,
                     embed_dim=EMBED_DIM,
                     hid_dim=HID_DIM,
@@ -60,6 +64,7 @@ if __name__ == "__main__":
                     epochs=500,
                     pt_path=ept)
 
+    # 2. 构建交通子图，保持与电力侧一致的嵌入维度
     tgraph = TraGraph(file1=TFILE1, file2=TFILE2, file3=TFILE3,
                     embed_dim=EMBED_DIM,
                     hid_dim=HID_DIM,
@@ -69,6 +74,7 @@ if __name__ == "__main__":
                     epochs=300,
                     pt_path=tpt)
 
+    # 3. 将两种子图合并成双图，用于跨模态攻击
     bigraph = Bigraph(efile=EFILE, tfile1=TFILE1, tfile2=TFILE2, tfile3=TFILE3, file=FILE,
                     embed_dim=EMBED_DIM,
                     hid_dim=HID_DIM,
@@ -79,6 +85,7 @@ if __name__ == "__main__":
                     epochs=600,
                     pt_path=perturb_bpt)
                     
+    # 4. 初始化 DQN 智能体，负责决策要攻击的节点
     agent = DQN(in_dim=EMBED_DIM,
                 hid_dim=HID_DIM,
                 out_dim=EMBED_DIM,
@@ -93,10 +100,12 @@ if __name__ == "__main__":
                 # model_pt='./model_param/'+args.feat+'/bi_max_reward.pt')
     
     elec_env = init_env()
+    # 5. 记录初始供电功率，用作奖励基线
     initial_power = elec_env.ruin([])
 
     
 
+    # 6. 根据输入选择预训练或随机特征
     if args.feat == "ptr":
         elec_feat = bigraph.feat['power'].detach()
         road_feat = bigraph.feat['junc'].detach()
@@ -118,6 +127,7 @@ if __name__ == "__main__":
     print(Fore.RED,Back.YELLOW,'begin attacking ...')
     print(Style.RESET_ALL)
 
+    # ---------------------- 测试阶段：固定策略评估 ----------------------
     if args.label == 'test':
         choosen_road = []
         choosen_elec = []
@@ -142,6 +152,7 @@ if __name__ == "__main__":
         gcc_record = []
 
         done = False
+        # 按照强化学习策略依次选择节点并评估连通性下降
         while not done:
 
             h_val = t_val
@@ -176,6 +187,7 @@ if __name__ == "__main__":
             gcc_record.append(t_val)
             result.append(total_reward)
 
+            # 达到预设攻击数量后停止
             if len(choosen) == NUM_TEST:
                 done = True
         
@@ -188,6 +200,7 @@ if __name__ == "__main__":
         choosen =  [bigraph.node_list[node] for node in choosen]
         np.savetxt('./result/test/mask_bi_nodes_'+args.feat+'.txt', np.array(choosen))
 
+    # ---------------------- 训练阶段：DQN 反复更新 ----------------------
     elif args.label == 'train':
 
         g = bigraph.nxgraph
@@ -211,6 +224,7 @@ if __name__ == "__main__":
             done = False
             result = []
 
+            # 训练循环：采样节点、计算奖励并写入经验池
             while not done:
 
                 h_val = t_val
@@ -242,8 +256,8 @@ if __name__ == "__main__":
                                         node, reward,
                                     _state.data.cpu().numpy())
                 
+                # 当经验池填满后开始梯度更新
                 if agent.memory_num > agent.mem_cap:
-                    
                     agent.learn(features)
 
                 state = _state

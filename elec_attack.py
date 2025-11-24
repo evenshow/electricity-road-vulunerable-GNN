@@ -1,3 +1,5 @@
+"""电力网络攻击实验脚本，添加中文注释说明流程。"""
+
 from model import ElecGraph, TraGraph, DQN
 from utils import init_env
 
@@ -11,6 +13,7 @@ from colorama import Fore,Back,Style
 
 init()
 
+# 参数解析区：控制训练轮次、采样规模与特征来源
 parser = argparse.ArgumentParser(description='elec attack')
 
 parser.add_argument('--epoch', type=int, default=1000, help='Times to train')
@@ -56,6 +59,7 @@ if __name__ == "__main__":
 
     elec_env = init_env()
 
+    # 选择预训练嵌入或随机初始化的节点特征
     if args.feat == "ptr":
         features = egraph.feat.detach()
         features = features.to(device)
@@ -86,6 +90,7 @@ if __name__ == "__main__":
     print(Fore.RED,Back.YELLOW,'begin attacking ...')
     print(Style.RESET_ALL)
 
+    # ---------------------- 测试阶段：只评估策略 ----------------------
     if args.label == 'test':
         
         # RL attack
@@ -98,6 +103,7 @@ if __name__ == "__main__":
         result = []
 
         done = False
+        # 遍历 RL 智能体选出的节点并计算剩余供电
         while not done:
             node = agent.attack(features, state, choosen)
             
@@ -114,6 +120,7 @@ if __name__ == "__main__":
 
             result.append([len(choosen), current_power])
 
+            # 达到既定攻击次数后结束
             if len(choosen) == 10:
                 done = True
         

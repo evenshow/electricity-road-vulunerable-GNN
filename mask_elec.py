@@ -1,3 +1,5 @@
+"""电力网掩码与特征训练脚本，添加中文注释便于阅读。"""
+
 from model import ElecGraph, GCN, construct_negative_graph, compute_loss
 from utils import init_env
 

@@ -1,3 +1,5 @@
+"""模型与图构建相关类，加入中文注释便于理解结构。"""
+
 import torch
 import torch.nn as nn
 import networkx as nx
