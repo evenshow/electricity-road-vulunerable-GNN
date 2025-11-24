@@ -1,3 +1,5 @@
+"""电力网络攻击实验脚本，添加中文注释说明流程。"""
+
 from model import ElecGraph, TraGraph, DQN
 from utils import init_env
 

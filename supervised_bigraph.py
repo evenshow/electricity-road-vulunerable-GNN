@@ -1,3 +1,5 @@
+"""双层图监督训练脚本，加入中文注释方便理解数据流。"""
+
 from model import ElecGraph, TraGraph, Bigraph, Regressor
 from utils import init_env, influenced_tl_by_elec, calculate_pairwise_connectivity
 
