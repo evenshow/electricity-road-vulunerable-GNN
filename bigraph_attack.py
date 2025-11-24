@@ -1,3 +1,5 @@
+"""执行双图攻击实验的脚本，添加中文注释方便理解参数含义。"""
+
 import argparse
 import time
 

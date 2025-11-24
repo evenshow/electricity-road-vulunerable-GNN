@@ -1,3 +1,5 @@
+"""电力图监督学习脚本，补充中文注释。"""
+
 from model import ElecGraph, Regressor
 from utils import init_env
 

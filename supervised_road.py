@@ -1,3 +1,5 @@
+"""道路图监督学习脚本，包含中文注释。"""
+
 from model import TraGraph, Regressor
 from utils import calculate_pairwise_connectivity
 

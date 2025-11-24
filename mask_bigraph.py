@@ -1,3 +1,5 @@
+"""对双层图进行掩码与特征训练的脚本，已补充中文注释。"""
+
 from model import ElecGraph, TraGraph, Bigraph, HeteroGCN
 from model import construct_negative_graph_with_type, compute_loss, numbers_to_etypes
 from utils import init_env, nodes_ranked_by_CI, nodes_ranked_by_Degree, calculate_pairwise_connectivity
